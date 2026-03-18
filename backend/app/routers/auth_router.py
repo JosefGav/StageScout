@@ -1,5 +1,6 @@
 import os
 import secrets
+from urllib.parse import urlencode
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException
 from app.schemas import SpotifyCallbackRequest, AuthResponse
@@ -31,14 +32,14 @@ def spotify_login():
     client_id = os.environ.get("SPOTIFY_CLIENT_ID", "")
     redirect_uri = os.environ.get("SPOTIFY_REDIRECT_URI", "")
 
-    authorize_url = (
-        f"{SPOTIFY_AUTH_URL}?"
-        f"client_id={client_id}"
-        f"&response_type=code"
-        f"&redirect_uri={redirect_uri}"
-        f"&scope={SPOTIFY_SCOPES}"
-        f"&state={state}"
-    )
+    params = urlencode({
+        "client_id": client_id,
+        "response_type": "code",
+        "redirect_uri": redirect_uri,
+        "scope": SPOTIFY_SCOPES,
+        "state": state,
+    })
+    authorize_url = f"{SPOTIFY_AUTH_URL}?{params}"
     return {"url": authorize_url}
 
 

@@ -1,8 +1,10 @@
 import os
 import sys
 import psycopg2
+from dotenv import load_dotenv
 
 MIGRATIONS_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(MIGRATIONS_DIR, "..", ".env"))
 
 
 def run_migrations(skip_vector_index=True):
