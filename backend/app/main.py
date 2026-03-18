@@ -7,12 +7,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.db import init_pool, close_pool
+from app.routers import auth_router, users, artists, events, notifications
+from jobs.scheduler import init_scheduler, shutdown_scheduler
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_pool()
+    init_scheduler()
     yield
+    shutdown_scheduler()
     close_pool()
 
 
@@ -25,6 +29,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router.router)
+app.include_router(users.router)
+app.include_router(artists.router)
+app.include_router(events.router)
+app.include_router(notifications.router)
 
 
 @app.get("/api/health")
