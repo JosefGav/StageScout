@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.triggers.cron import CronTrigger
@@ -11,12 +13,13 @@ def init_scheduler():
     from app.services.event_service import cleanup_old_events, cleanup_old_job_runs
     from app.services.ticketmaster_service import reset_daily_count
 
-    # Fetch events every 6 hours
+    # Fetch events every 6 hours, first run 30s after startup
     scheduler.add_job(
         fetch_events_job,
         trigger=IntervalTrigger(hours=6),
         id="fetch_events",
         replace_existing=True,
+        next_run_time=datetime.now() + timedelta(seconds=30),
     )
 
     # Send weekly digest: Monday 9am UTC
