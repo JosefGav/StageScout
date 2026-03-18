@@ -1,9 +1,10 @@
+import re
+import math
 from app.db import query, query_one, execute
 from app.constants import (
     EVENT_SORT_FIELDS, EVENT_SORT_DIRS, DEFAULT_EVENT_SORT, DEFAULT_SORT_DIR,
     DEFAULT_PAGE, DEFAULT_PER_PAGE, normalize_artist_name, SIMILARITY_THRESHOLD
 )
-import math
 
 
 def upsert_venue(venue_data: dict) -> int | None:
@@ -64,12 +65,23 @@ def upsert_event(event_data: dict) -> dict:
 
     # Link artists
     if event and event_data.get("artists"):
-        _link_event_artists(event["id"], event_data["artists"])
+        _link_event_artists(event["id"], event_data["artists"], event_data["name"])
 
     return event
 
 
-def _link_event_artists(event_id: int, artists: list):
+# Keywords in event name that suggest a tribute/cover/musical rather than the actual artist
+_TRIBUTE_KEYWORDS = re.compile(
+    r'\b(tribute|tributo|experience|celebrates?|celebrating|legacy|memorial|'
+    r'remembering|homage|salute|starring|musical|the music of|songs of|'
+    r'performed by|cover|coverband|re-?live|back to black)\b',
+    re.IGNORECASE,
+)
+
+
+def _link_event_artists(event_id: int, artists: list, event_name: str = ""):
+    is_tribute_event = bool(_TRIBUTE_KEYWORDS.search(event_name))
+
     for artist_data in artists:
         name_norm = normalize_artist_name(artist_data["name"])
         match_quality = "exact_name"
@@ -100,6 +112,10 @@ def _link_event_artists(event_id: int, artists: list):
             """, (f"tm_{artist_data.get('ticketmaster_id', name_norm)}", artist_data["name"], name_norm))
             artist = query_one("SELECT id FROM artists WHERE name_normalized = %s", (name_norm,))
             match_quality = "exact_name"  # orphan is an exact match to itself
+
+        # Downgrade to fuzzy if the event name suggests a tribute/cover
+        if is_tribute_event and match_quality == "exact_name":
+            match_quality = "fuzzy"
 
         if artist:
             execute("""
