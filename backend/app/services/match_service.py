@@ -98,12 +98,7 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
             MIN(ea.match_quality) as match_quality,
             MAX(m.similarity_score) as similarity_score,
             json_agg(json_build_object(
-                'id', a.id, 'name', a.name, 'image_url', a.image_url,
-                'tracks', (
-                    SELECT json_agg(ut.track_name ORDER BY ut.track_name)
-                    FROM user_tracks ut
-                    WHERE ut.user_id = m.user_id AND ut.artist_id = a.id
-                )
+                'id', a.id, 'name', a.name, 'image_url', a.image_url
             ) ORDER BY a.name) FILTER (WHERE a.id IS NOT NULL) as matched_artists
         FROM user_event_matches m
         JOIN events e ON e.id = m.event_id
@@ -121,6 +116,24 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
 
 def get_recommended_events(user_id: int) -> list:
     return get_matched_events(user_id, match_type="similar")
+
+
+def get_event_match_details(user_id: int, event_id: int) -> list:
+    """Get matched artists + user's saved tracks for a specific event."""
+    return query("""
+        SELECT a.id, a.name, a.image_url, m.match_type, m.similarity_score,
+            ea.match_quality,
+            (
+                SELECT json_agg(ut.track_name ORDER BY ut.track_name)
+                FROM user_tracks ut
+                WHERE ut.user_id = m.user_id AND ut.artist_id = a.id
+            ) as tracks
+        FROM user_event_matches m
+        JOIN artists a ON a.id = m.matched_artist_id
+        LEFT JOIN event_artists ea ON ea.event_id = m.event_id AND ea.artist_id = m.event_artist_id
+        WHERE m.user_id = %s AND m.event_id = %s
+        ORDER BY m.match_type ASC, a.name ASC
+    """, (user_id, event_id))
 
 
 def cleanup_stale_matches():

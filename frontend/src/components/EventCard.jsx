@@ -39,15 +39,7 @@ export default function EventCard({ event, matchType }) {
         {matchedArtists.length > 0 ? (
           <div className="mb-1">
             {matchedArtists.map(a => (
-              <div key={a.id}>
-                <p className="text-accent text-xs font-medium">{a.name}</p>
-                {a.tracks && a.tracks.length > 0 && (
-                  <p className="text-text-secondary text-xs pl-2 truncate">
-                    {a.tracks.slice(0, 3).join(', ')}
-                    {a.tracks.length > 3 && ` +${a.tracks.length - 3} more`}
-                  </p>
-                )}
-              </div>
+              <p key={a.id} className="text-accent text-xs font-medium">{a.name}</p>
             ))}
           </div>
         ) : artistName ? (

@@ -3,7 +3,7 @@ import threading
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.auth import require_user
 from app.services.event_service import get_events, get_event_by_id
-from app.services.match_service import get_matched_events, get_recommended_events
+from app.services.match_service import get_matched_events, get_recommended_events, get_event_match_details
 
 router = APIRouter(prefix="/api/events", tags=["events"])
 
@@ -48,4 +48,5 @@ def get_event(event_id: int, user: dict = Depends(require_user)):
     event = get_event_by_id(event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
+    event["matched_artists"] = get_event_match_details(user["id"], event_id)
     return event

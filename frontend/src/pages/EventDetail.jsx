@@ -66,9 +66,33 @@ export default function EventDetail() {
             )}
           </div>
 
+          {event.matched_artists && event.matched_artists.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold mb-3">Your Matches</h2>
+              <div className="space-y-3">
+                {event.matched_artists.map(a => (
+                  <div key={a.id} className="flex items-start gap-3">
+                    {a.image_url && (
+                      <img src={a.image_url} alt={a.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                    )}
+                    <div>
+                      <p className="text-accent font-medium text-sm">{a.name}</p>
+                      {a.tracks && a.tracks.length > 0 && (
+                        <p className="text-text-secondary text-xs mt-0.5">
+                          Your songs: {a.tracks.slice(0, 5).join(', ')}
+                          {a.tracks.length > 5 && ` +${a.tracks.length - 5} more`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {event.artists && event.artists.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Artists</h2>
+              <h2 className="text-lg font-semibold mb-3">All Artists</h2>
               <div className="flex flex-wrap gap-2">
                 {event.artists.map(a => (
                   <ArtistChip key={a.id} artist={a} />
