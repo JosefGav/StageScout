@@ -28,9 +28,18 @@ function MapAutoFit({ lat, lng, radiusMiles }) {
   const map = useMap();
   useEffect(() => {
     if (lat == null || lng == null) return;
-    const radiusMeters = radiusMiles * 1609.34;
-    const circle = L.circle([lat, lng], { radius: radiusMeters });
-    map.fitBounds(circle.getBounds(), { padding: [20, 20] });
+    // Defer fitBounds until map is ready (has a valid size)
+    const fit = () => {
+      const radiusMeters = radiusMiles * 1609.34;
+      const center = L.latLng(lat, lng);
+      const bounds = center.toBounds(radiusMeters * 2);
+      map.fitBounds(bounds, { padding: [20, 20] });
+    };
+    if (map.getSize().x > 0) {
+      fit();
+    } else {
+      map.whenReady(fit);
+    }
   }, [lat, lng, radiusMiles, map]);
   return null;
 }
