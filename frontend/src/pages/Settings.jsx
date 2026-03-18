@@ -10,6 +10,8 @@ export default function Settings() {
   const [message, setMessage] = useState('');
 
   const [city, setCity] = useState(user?.city || '');
+  const [latitude, setLatitude] = useState(user?.latitude ?? null);
+  const [longitude, setLongitude] = useState(user?.longitude ?? null);
   const [radius, setRadius] = useState(user?.search_radius_miles || 50);
   const [digestEnabled, setDigestEnabled] = useState(user?.digest_enabled ?? true);
   const [digestFrequency, setDigestFrequency] = useState(user?.digest_frequency || 'weekly');
@@ -20,6 +22,8 @@ export default function Settings() {
     try {
       const updated = await api.put('/users/me', {
         city,
+        latitude,
+        longitude,
         search_radius_miles: radius,
       });
       setUser(prev => ({ ...prev, ...updated }));
@@ -71,20 +75,15 @@ export default function Settings() {
       {/* Location */}
       <section className="bg-surface-elevated rounded-lg p-6 mb-4">
         <h2 className="text-lg font-semibold mb-4">Location</h2>
-        <LocationPicker city={city} setCity={setCity} />
-        <div className="mt-4">
-          <label className="text-sm text-text-secondary block mb-1">
-            Search radius (miles)
-          </label>
-          <input
-            type="number"
-            value={radius}
-            onChange={e => setRadius(Number(e.target.value))}
-            min={10}
-            max={500}
-            className="w-full bg-surface rounded-lg px-3 py-2 text-text-primary border border-surface-hover focus:border-accent focus:outline-none"
-          />
-        </div>
+        <LocationPicker
+          city={city}
+          setCity={setCity}
+          latitude={latitude}
+          longitude={longitude}
+          setLatLng={(lat, lng) => { setLatitude(lat); setLongitude(lng); }}
+          radius={radius}
+          setRadius={setRadius}
+        />
         <button
           onClick={saveLocation}
           disabled={saving}
