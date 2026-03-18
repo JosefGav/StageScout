@@ -1,6 +1,6 @@
 import logging
 from app.db import query, query_one, execute
-from app.constants import normalize_artist_name
+from app.constants import normalize_artist_name, AUDIO_FEATURE_KEYS
 from app.services import spotify_service
 from app.services.user_service import update_sync_status, set_last_sync
 

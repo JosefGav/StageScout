@@ -1,10 +1,13 @@
 import os
 import base64
 import time
+import logging
 from datetime import datetime, timezone, timedelta
 import httpx
 from app.db import query_one, execute
 from app.constants import SPOTIFY_TOKEN_URL, SPOTIFY_API_BASE
+
+logger = logging.getLogger(__name__)
 
 CLIENT_ID = os.environ.get("SPOTIFY_CLIENT_ID", "")
 CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET", "")
@@ -154,3 +157,21 @@ def fetch_several_artists(token: str, spotify_ids: list[str]) -> list:
         all_artists.extend([a for a in data.get("artists", []) if a is not None])
         time.sleep(0.1)
     return all_artists
+
+
+def fetch_related_artists(token: str, spotify_id: str) -> list:
+    """Stub — Spotify related-artists endpoint is restricted in Development Mode."""
+    logger.warning("fetch_related_artists: endpoint restricted in Spotify Development Mode — returning empty")
+    return []
+
+
+def fetch_top_tracks(token: str, spotify_id: str) -> list:
+    """Stub — Spotify top-tracks endpoint is restricted in Development Mode."""
+    logger.warning("fetch_top_tracks: endpoint restricted in Spotify Development Mode — returning empty")
+    return []
+
+
+def fetch_audio_features(token: str, track_ids: list[str]) -> list:
+    """Stub — Spotify audio-features endpoint is restricted in Development Mode."""
+    logger.warning("fetch_audio_features: endpoint restricted in Spotify Development Mode — returning empty")
+    return []
