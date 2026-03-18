@@ -66,7 +66,13 @@ def parse_event(raw: dict) -> dict:
     price_max = price_ranges[0].get("max") if price_ranges else None
 
     images = raw.get("images", [])
-    image_url = images[0].get("url") if images else None
+    # Prefer the widest 16:9 image for banner quality; fall back to widest of any ratio
+    wide_images = [img for img in images if img.get("ratio") == "16_9"]
+    pool = wide_images or images
+    if pool:
+        image_url = max(pool, key=lambda img: img.get("width", 0)).get("url")
+    else:
+        image_url = None
 
     ticket_url = raw.get("url")
 
