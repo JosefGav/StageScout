@@ -9,7 +9,10 @@ export default function EventCard({ event, matchType }) {
   const image = event.image_url;
   const venueName = event.venue_name;
   const venueCity = event.venue_city;
-  const artistName = event.artist_name;
+  const matchedArtists = event.matched_artists || [];
+  const artistName = matchedArtists.length > 0
+    ? matchedArtists.map(a => a.name).join(', ')
+    : event.artist_name;
   const similarity = event.similarity_score;
 
   const dateStr = date

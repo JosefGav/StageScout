@@ -72,7 +72,7 @@ export default function Dashboard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {matched.map(m => (
-                  <EventCard key={m.id} event={m} matchType="exact" />
+                  <EventCard key={m.event_id} event={m} matchType="exact" />
                 ))}
               </div>
             )}
@@ -94,7 +94,7 @@ export default function Dashboard() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {recommended.map(m => (
-                  <EventCard key={m.id} event={m} matchType="similar" />
+                  <EventCard key={m.event_id} event={m} matchType="similar" />
                 ))}
               </div>
             )}

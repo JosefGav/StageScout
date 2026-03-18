@@ -1,7 +1,7 @@
 import logging
 from app.db import query
 from app.services import ticketmaster_service, event_service
-from app.services.match_service import compute_matches_for_user
+from app.services.match_service import compute_matches_for_user, cleanup_stale_matches
 from app.services.job_service import start_job, complete_job, fail_job
 
 logger = logging.getLogger(__name__)
@@ -65,6 +65,9 @@ def fetch_events_job():
                 except Exception as e:
                     logger.warning(f"Failed to fetch events for {artist['name']} in {city_key}: {e}")
                     continue
+
+        # Clean up matches for cancelled/past events before recomputing
+        cleanup_stale_matches()
 
         # Compute matches for all users
         for u in users:

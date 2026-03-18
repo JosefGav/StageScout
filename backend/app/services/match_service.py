@@ -69,24 +69,58 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
         conditions.append("m.match_type = %s")
         params.append(match_type)
 
+    # Filter by user's location radius using Haversine.
+    # Events with no venue coordinates are excluded.
+    conditions.append("""
+        v.latitude IS NOT NULL AND v.longitude IS NOT NULL
+        AND u.latitude IS NOT NULL AND u.longitude IS NOT NULL
+        AND (
+            3959 * acos(
+                LEAST(1.0, cos(radians(u.latitude)) * cos(radians(v.latitude))
+                * cos(radians(v.longitude) - radians(u.longitude))
+                + sin(radians(u.latitude)) * sin(radians(v.latitude)))
+            )
+        ) <= u.search_radius_miles
+    """)
+
     where = " AND ".join(conditions)
 
+    # Group by event to deduplicate multi-artist matches.
+    # Collect matched artists into a JSON array; pick best match_type and quality per event.
     return query(f"""
-        SELECT m.id, m.match_type, m.similarity_score,
+        SELECT
             e.id as event_id, e.name as event_name, e.event_date, e.image_url,
             e.price_min, e.price_max, e.ticket_url, e.status,
             v.name as venue_name, v.city as venue_city, v.state as venue_state,
-            a.id as artist_id, a.name as artist_name, a.image_url as artist_image,
-            ea.match_quality
+            MIN(m.match_type) as match_type,
+            MIN(ea.match_quality) as match_quality,
+            MAX(m.similarity_score) as similarity_score,
+            json_agg(json_build_object(
+                'id', a.id, 'name', a.name, 'image_url', a.image_url
+            ) ORDER BY a.name) FILTER (WHERE a.id IS NOT NULL) as matched_artists
         FROM user_event_matches m
         JOIN events e ON e.id = m.event_id
+        JOIN users u ON u.id = m.user_id
         LEFT JOIN venues v ON v.id = e.venue_id
         LEFT JOIN artists a ON a.id = m.matched_artist_id
         LEFT JOIN event_artists ea ON ea.event_id = e.id AND ea.artist_id = m.event_artist_id
         WHERE {where}
-        ORDER BY ea.match_quality ASC, m.match_type ASC, e.event_date ASC
+        GROUP BY e.id, e.name, e.event_date, e.image_url,
+            e.price_min, e.price_max, e.ticket_url, e.status,
+            v.name, v.city, v.state
+        ORDER BY MIN(ea.match_quality) ASC, MIN(m.match_type) ASC, e.event_date ASC
     """, params)
 
 
 def get_recommended_events(user_id: int) -> list:
     return get_matched_events(user_id, match_type="similar")
+
+
+def cleanup_stale_matches():
+    """Remove matches for events that are no longer active or have passed."""
+    execute("""
+        DELETE FROM user_event_matches m
+        USING events e
+        WHERE m.event_id = e.id
+            AND (e.status != 'active' OR e.event_date < NOW())
+    """)
