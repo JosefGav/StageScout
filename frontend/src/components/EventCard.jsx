@@ -36,9 +36,23 @@ export default function EventCard({ event, matchType }) {
           </h3>
           <MatchBadge type={matchType || event.match_type} similarity={similarity} matchQuality={event.match_quality} />
         </div>
-        {artistName && (
+        {matchedArtists.length > 0 ? (
+          <div className="mb-1">
+            {matchedArtists.map(a => (
+              <div key={a.id}>
+                <p className="text-accent text-xs font-medium">{a.name}</p>
+                {a.tracks && a.tracks.length > 0 && (
+                  <p className="text-text-secondary text-xs pl-2 truncate">
+                    {a.tracks.slice(0, 3).join(', ')}
+                    {a.tracks.length > 3 && ` +${a.tracks.length - 3} more`}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : artistName ? (
           <p className="text-accent text-xs mb-1">{artistName}</p>
-        )}
+        ) : null}
         <p className="text-text-secondary text-xs">{dateStr}</p>
         {venueName && (
           <p className="text-text-secondary text-xs">

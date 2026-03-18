@@ -76,7 +76,7 @@ def fetch_top_artists(token: str, limit: int = 50) -> list:
 
 
 def fetch_liked_songs(token: str) -> list:
-    """Paginate through all liked songs, extract artists."""
+    """Paginate through all liked songs, extract artists and their tracks."""
     artists = {}
     url = f"{SPOTIFY_API_BASE}/me/tracks"
     params = {"limit": 50}
@@ -85,13 +85,16 @@ def fetch_liked_songs(token: str) -> list:
         data = spotify_get(token, url, params)
         for item in data.get("items", []):
             track = item.get("track", {})
+            track_id = track.get("id")
+            track_name = track.get("name")
             for artist in track.get("artists", []):
                 aid = artist.get("id")
                 if aid:
-                    if aid in artists:
-                        artists[aid]["count"] += 1
-                    else:
-                        artists[aid] = {"spotify_data": artist, "count": 1}
+                    if aid not in artists:
+                        artists[aid] = {"spotify_data": artist, "count": 0, "tracks": []}
+                    artists[aid]["count"] += 1
+                    if track_id and track_name:
+                        artists[aid]["tracks"].append({"id": track_id, "name": track_name})
         url = data.get("next")
         params = None  # next URL has params built in
         time.sleep(0.1)
@@ -100,7 +103,7 @@ def fetch_liked_songs(token: str) -> list:
 
 
 def fetch_playlist_tracks(token: str) -> list:
-    """Fetch artists from user's playlists."""
+    """Fetch artists and their tracks from user's playlists."""
     artists = {}
 
     # Get playlists
@@ -120,13 +123,16 @@ def fetch_playlist_tracks(token: str) -> list:
                 track = item.get("track")
                 if not track:
                     continue
+                track_id = track.get("id")
+                track_name = track.get("name")
                 for artist in track.get("artists", []):
                     aid = artist.get("id")
                     if aid:
-                        if aid in artists:
-                            artists[aid]["count"] += 1
-                        else:
-                            artists[aid] = {"spotify_data": artist, "count": 1}
+                        if aid not in artists:
+                            artists[aid] = {"spotify_data": artist, "count": 0, "tracks": []}
+                        artists[aid]["count"] += 1
+                        if track_id and track_name:
+                            artists[aid]["tracks"].append({"id": track_id, "name": track_name})
             time.sleep(0.1)
         except Exception:
             continue  # skip inaccessible playlists
@@ -138,20 +144,13 @@ def fetch_artist_details(token: str, spotify_id: str) -> dict:
     return spotify_get(token, f"{SPOTIFY_API_BASE}/artists/{spotify_id}")
 
 
-def fetch_related_artists(token: str, spotify_id: str) -> list:
-    data = spotify_get(token, f"{SPOTIFY_API_BASE}/artists/{spotify_id}/related-artists")
-    return data.get("artists", [])
-
-
-def fetch_top_tracks(token: str, spotify_id: str) -> list:
-    data = spotify_get(token, f"{SPOTIFY_API_BASE}/artists/{spotify_id}/top-tracks", {"market": "US"})
-    return data.get("tracks", [])
-
-
-def fetch_audio_features(token: str, track_ids: list) -> list:
-    """Fetch audio features for up to 100 tracks."""
-    if not track_ids:
-        return []
-    ids_str = ",".join(track_ids[:100])
-    data = spotify_get(token, f"{SPOTIFY_API_BASE}/audio-features", {"ids": ids_str})
-    return [f for f in data.get("audio_features", []) if f is not None]
+def fetch_several_artists(token: str, spotify_ids: list[str]) -> list:
+    """Batch-fetch up to 50 artists at a time. Returns full artist objects with genres + popularity."""
+    all_artists = []
+    for i in range(0, len(spotify_ids), 50):
+        batch = spotify_ids[i:i + 50]
+        ids_str = ",".join(batch)
+        data = spotify_get(token, f"{SPOTIFY_API_BASE}/artists", {"ids": ids_str})
+        all_artists.extend([a for a in data.get("artists", []) if a is not None])
+        time.sleep(0.1)
+    return all_artists

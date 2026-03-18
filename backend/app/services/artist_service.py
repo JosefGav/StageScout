@@ -1,6 +1,6 @@
 import logging
 from app.db import query, query_one, execute
-from app.constants import normalize_artist_name, AUDIO_FEATURE_KEYS
+from app.constants import normalize_artist_name
 from app.services import spotify_service
 from app.services.user_service import update_sync_status, set_last_sync
 
@@ -53,6 +53,16 @@ def upsert_user_artist(user_id: int, artist_id: int, source: str = "liked_songs"
         SET play_weight = GREATEST(user_artists.play_weight, EXCLUDED.play_weight),
             synced_at = NOW()
     """, (user_id, artist_id, source, play_weight))
+
+
+def upsert_user_tracks(user_id: int, artist_id: int, tracks: list, source: str = "liked_songs"):
+    """Store a user's saved tracks for a given artist."""
+    for t in tracks:
+        execute("""
+            INSERT INTO user_tracks (user_id, artist_id, spotify_track_id, track_name, source)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (user_id, spotify_track_id) DO NOTHING
+        """, (user_id, artist_id, t["id"], t["name"], source))
 
 
 def get_user_artists(user_id: int) -> list:
@@ -146,6 +156,8 @@ def run_full_sync(user_id: int):
             artist = upsert_artist(spotify_id=sp["id"], name=sp["name"])
             weight = min(item["count"] * 0.5, 10.0)
             upsert_user_artist(user_id, artist["id"], source="liked_songs", play_weight=weight)
+            if item.get("tracks"):
+                upsert_user_tracks(user_id, artist["id"], item["tracks"], source="liked_songs")
             artist_ids.append(artist["id"])
 
         playlist_data = spotify_service.fetch_playlist_tracks(token)
@@ -154,6 +166,8 @@ def run_full_sync(user_id: int):
             artist = upsert_artist(spotify_id=sp["id"], name=sp["name"])
             weight = min(item["count"] * 0.3, 5.0)
             upsert_user_artist(user_id, artist["id"], source="playlist", play_weight=weight)
+            if item.get("tracks"):
+                upsert_user_tracks(user_id, artist["id"], item["tracks"], source="playlist")
             artist_ids.append(artist["id"])
 
         unique_ids = list(set(artist_ids))
