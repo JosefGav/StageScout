@@ -136,7 +136,8 @@ def get_matched_events(user_id: int, match_type: str = None, sort_by: str = None
         WHERE {where}
         GROUP BY e.id, e.name, e.event_date, e.image_url,
             e.price_min, e.price_max, e.ticket_url, e.status,
-            v.name, v.city, v.state
+            v.name, v.city, v.state, v.latitude, v.longitude,
+            u.latitude, u.longitude
         ORDER BY {order_clause}
     """, params)
 
