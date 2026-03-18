@@ -61,7 +61,7 @@ def upsert_user_tracks(user_id: int, artist_id: int, tracks: list, source: str =
         execute("""
             INSERT INTO user_tracks (user_id, artist_id, spotify_track_id, track_name, source)
             VALUES (%s, %s, %s, %s, %s)
-            ON CONFLICT (user_id, spotify_track_id) DO NOTHING
+            ON CONFLICT (user_id, artist_id, spotify_track_id) DO NOTHING
         """, (user_id, artist_id, t["id"], t["name"], source))
 
 
