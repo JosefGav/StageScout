@@ -24,7 +24,7 @@ AUDIO_FEATURE_KEYS = [
 
 # Recommendation
 TOP_RECOMMENDED_ARTISTS = 50
-SIMILARITY_THRESHOLD = 0.7  # pg_trgm threshold for fuzzy artist matching
+SIMILARITY_THRESHOLD = 0.9  # pg_trgm threshold for fuzzy artist matching
 
 # Spotify
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"

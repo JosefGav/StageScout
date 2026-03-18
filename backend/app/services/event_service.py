@@ -72,6 +72,7 @@ def upsert_event(event_data: dict) -> dict:
 def _link_event_artists(event_id: int, artists: list):
     for artist_data in artists:
         name_norm = normalize_artist_name(artist_data["name"])
+        match_quality = "exact_name"
 
         # Try exact normalized match
         artist = query_one(
@@ -87,6 +88,8 @@ def _link_event_artists(event_id: int, artists: list):
                 ORDER BY similarity(name_normalized, %s) DESC
                 LIMIT 1
             """, (name_norm, SIMILARITY_THRESHOLD, name_norm))
+            if artist:
+                match_quality = "fuzzy"
 
         # Create orphan artist if no match
         if not artist:
@@ -96,13 +99,14 @@ def _link_event_artists(event_id: int, artists: list):
                 ON CONFLICT (spotify_id) DO NOTHING
             """, (f"tm_{artist_data.get('ticketmaster_id', name_norm)}", artist_data["name"], name_norm))
             artist = query_one("SELECT id FROM artists WHERE name_normalized = %s", (name_norm,))
+            match_quality = "exact_name"  # orphan is an exact match to itself
 
         if artist:
             execute("""
-                INSERT INTO event_artists (event_id, artist_id, is_headliner)
-                VALUES (%s, %s, %s)
-                ON CONFLICT DO NOTHING
-            """, (event_id, artist["id"], artist_data.get("is_headliner", False)))
+                INSERT INTO event_artists (event_id, artist_id, is_headliner, match_quality)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (event_id, artist_id) DO UPDATE SET match_quality = EXCLUDED.match_quality
+            """, (event_id, artist["id"], artist_data.get("is_headliner", False), match_quality))
 
 
 def get_events(search: str = None, sort_by: str = None, sort_dir: str = None,

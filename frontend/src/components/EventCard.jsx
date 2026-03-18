@@ -31,7 +31,7 @@ export default function EventCard({ event, matchType }) {
           <h3 className="font-semibold text-sm leading-tight line-clamp-2">
             {name}
           </h3>
-          <MatchBadge type={matchType || event.match_type} similarity={similarity} />
+          <MatchBadge type={matchType || event.match_type} similarity={similarity} matchQuality={event.match_quality} />
         </div>
         {artistName && (
           <p className="text-accent text-xs mb-1">{artistName}</p>

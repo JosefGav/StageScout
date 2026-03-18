@@ -76,13 +76,15 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
             e.id as event_id, e.name as event_name, e.event_date, e.image_url,
             e.price_min, e.price_max, e.ticket_url, e.status,
             v.name as venue_name, v.city as venue_city, v.state as venue_state,
-            a.id as artist_id, a.name as artist_name, a.image_url as artist_image
+            a.id as artist_id, a.name as artist_name, a.image_url as artist_image,
+            ea.match_quality
         FROM user_event_matches m
         JOIN events e ON e.id = m.event_id
         LEFT JOIN venues v ON v.id = e.venue_id
         LEFT JOIN artists a ON a.id = m.matched_artist_id
+        LEFT JOIN event_artists ea ON ea.event_id = e.id AND ea.artist_id = m.event_artist_id
         WHERE {where}
-        ORDER BY m.match_type ASC, e.event_date ASC
+        ORDER BY ea.match_quality ASC, m.match_type ASC, e.event_date ASC
     """, params)
 
 

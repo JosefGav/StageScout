@@ -1,8 +1,13 @@
-export default function MatchBadge({ type, similarity }) {
+export default function MatchBadge({ type, similarity, matchQuality }) {
   if (type === 'exact') {
+    const isConfirmed = matchQuality === 'exact_name';
     return (
-      <span className="shrink-0 bg-success/20 text-success text-xs px-2 py-0.5 rounded-full font-medium">
-        Exact Match
+      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${
+        isConfirmed
+          ? 'bg-success/20 text-success'
+          : 'bg-warning/20 text-warning'
+      }`}>
+        {isConfirmed ? 'Confirmed' : 'Possibly Tribute'}
       </span>
     );
   }
