@@ -14,7 +14,9 @@ def upsert_artist(spotify_id: str, name: str, image_url: str | None = None,
 
     if existing:
         execute("""
-            UPDATE artists SET image_url = %s, popularity = %s WHERE spotify_id = %s
+            UPDATE artists SET image_url = COALESCE(%s, image_url),
+                               popularity = COALESCE(%s, popularity)
+            WHERE spotify_id = %s
         """, (image_url, popularity, spotify_id))
         artist = query_one("SELECT * FROM artists WHERE spotify_id = %s", (spotify_id,))
     else:
@@ -173,6 +175,9 @@ def run_full_sync(user_id: int):
         unique_ids = list(set(artist_ids))
         update_sync_status(user_id, "syncing_stage2", len(unique_ids))
 
+        # Backfill missing artist images for artists discovered via liked songs / playlists
+        _backfill_artist_images(user_id, unique_ids)
+
         # Stage 3: Related artists + audio features + centroid
         update_sync_status(user_id, "syncing_stage3", len(unique_ids))
 
@@ -235,3 +240,37 @@ def _fetch_related_artists_for_user(user_id: int, artist_ids: list[int]):
         except Exception as e:
             logger.warning(f"Failed to fetch related artists for {artist['spotify_id']}: {e}")
             continue
+
+
+def _backfill_artist_images(user_id: int, artist_ids: list[int]):
+    """Batch-fetch full artist details for artists missing images."""
+    if not artist_ids:
+        return
+
+    missing = query("""
+        SELECT id, spotify_id FROM artists
+        WHERE id = ANY(%s) AND image_url IS NULL AND spotify_id IS NOT NULL
+    """, (artist_ids,))
+
+    if not missing:
+        return
+
+    logger.info(f"Backfilling images for {len(missing)} artists")
+    token = spotify_service.get_valid_token(user_id)
+    spotify_ids = [a["spotify_id"] for a in missing]
+
+    try:
+        full_artists = spotify_service.fetch_several_artists(token, spotify_ids)
+        for sp_artist in full_artists:
+            images = sp_artist.get("images", [])
+            image_url = images[0]["url"] if images else None
+            if image_url:
+                upsert_artist(
+                    spotify_id=sp_artist["id"],
+                    name=sp_artist["name"],
+                    image_url=image_url,
+                    popularity=sp_artist.get("popularity"),
+                    genres=sp_artist.get("genres", []),
+                )
+    except Exception as e:
+        logger.warning(f"Failed to backfill artist images: {e}")

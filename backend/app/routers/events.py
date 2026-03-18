@@ -22,17 +22,17 @@ def list_events(
 
 
 @router.get("/matched")
-def matched_events(user: dict = Depends(require_user)):
+def matched_events(sort_by: str = None, user: dict = Depends(require_user)):
     if not user.get("city"):
         raise HTTPException(status_code=400, detail="Location required")
-    return get_matched_events(user["id"])
+    return get_matched_events(user["id"], sort_by=sort_by)
 
 
 @router.get("/recommended")
-def recommended_events(user: dict = Depends(require_user)):
+def recommended_events(sort_by: str = None, user: dict = Depends(require_user)):
     if not user.get("city"):
         raise HTTPException(status_code=400, detail="Location required")
-    return get_recommended_events(user["id"])
+    return get_recommended_events(user["id"], sort_by=sort_by)
 
 
 @router.post("/trigger-fetch")

@@ -1,4 +1,5 @@
 from app.db import query, execute
+from app.constants import MATCHED_EVENT_SORT_FIELDS
 
 
 def compute_matches_for_user(user_id: int) -> int:
@@ -61,7 +62,7 @@ def compute_matches_for_user(user_id: int) -> int:
     return count
 
 
-def get_matched_events(user_id: int, match_type: str = None) -> list:
+def get_matched_events(user_id: int, match_type: str = None, sort_by: str = None) -> list:
     conditions = ["m.user_id = %s", "e.status = 'active'", "e.event_date > NOW()"]
     params = [user_id]
 
@@ -87,6 +88,31 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
 
     where = " AND ".join(conditions)
 
+    # Validate sort_by against whitelist
+    if sort_by not in MATCHED_EVENT_SORT_FIELDS:
+        sort_by = "date"
+
+    # Build ORDER BY clause
+    if sort_by == "distance":
+        order_clause = """
+            CASE WHEN v.latitude IS NULL OR v.longitude IS NULL
+                      OR u.latitude IS NULL OR u.longitude IS NULL THEN 1 ELSE 0 END ASC,
+            3959 * acos(
+                LEAST(1.0, cos(radians(u.latitude)) * cos(radians(v.latitude))
+                * cos(radians(v.longitude) - radians(u.longitude))
+                + sin(radians(u.latitude)) * sin(radians(v.latitude)))
+            ) ASC, e.event_date ASC
+        """
+    elif sort_by == "play_weight":
+        order_clause = "MAX(ua.play_weight) DESC NULLS LAST, e.event_date ASC"
+    else:
+        order_clause = "e.event_date ASC"
+
+    # Build optional play_weight join
+    play_weight_join = ""
+    if sort_by == "play_weight":
+        play_weight_join = "LEFT JOIN user_artists ua ON ua.artist_id = m.matched_artist_id AND ua.user_id = m.user_id"
+
     # Group by event to deduplicate multi-artist matches.
     # Collect matched artists into a JSON array; pick best match_type and quality per event.
     return query(f"""
@@ -106,16 +132,17 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
         LEFT JOIN venues v ON v.id = e.venue_id
         LEFT JOIN artists a ON a.id = m.matched_artist_id
         LEFT JOIN event_artists ea ON ea.event_id = e.id AND ea.artist_id = m.event_artist_id
+        {play_weight_join}
         WHERE {where}
         GROUP BY e.id, e.name, e.event_date, e.image_url,
             e.price_min, e.price_max, e.ticket_url, e.status,
             v.name, v.city, v.state
-        ORDER BY MIN(ea.match_quality) ASC, MIN(m.match_type) ASC, e.event_date ASC
+        ORDER BY {order_clause}
     """, params)
 
 
-def get_recommended_events(user_id: int) -> list:
-    return get_matched_events(user_id, match_type="similar")
+def get_recommended_events(user_id: int, sort_by: str = None) -> list:
+    return get_matched_events(user_id, match_type="similar", sort_by=sort_by)
 
 
 def get_event_match_details(user_id: int, event_id: int) -> list:

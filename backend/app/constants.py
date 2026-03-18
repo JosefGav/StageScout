@@ -14,6 +14,9 @@ DEFAULT_SORT_DIR = "asc"
 # Artist sort whitelists
 ARTIST_SORT_FIELDS = {"name", "popularity", "created_at"}
 
+# Matched event sort whitelists
+MATCHED_EVENT_SORT_FIELDS = {"date", "distance", "play_weight"}
+
 # Embedding config
 AUDIO_FEATURE_DIM = 11
 AUDIO_FEATURE_KEYS = [

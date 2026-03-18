@@ -5,11 +5,18 @@ import EventCard from '../components/EventCard';
 import SyncStatus from '../components/SyncStatus';
 import { Link } from 'react-router-dom';
 
+const SORT_OPTIONS = [
+  { value: 'date', label: 'Date (soonest)' },
+  { value: 'distance', label: 'Closest' },
+  { value: 'play_weight', label: 'Most listened to' },
+];
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [matched, setMatched] = useState([]);
   const [recommended, setRecommended] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState('date');
 
   const needsLocation = !user?.city;
 
@@ -18,14 +25,16 @@ export default function Dashboard() {
       setLoading(false);
       return;
     }
+    setLoading(true);
+    const params = sortBy !== 'date' ? `?sort_by=${sortBy}` : '';
     Promise.all([
-      api.get('/events/matched').catch(() => []),
-      api.get('/events/recommended').catch(() => []),
+      api.get(`/events/matched${params}`).catch(() => []),
+      api.get(`/events/recommended${params}`).catch(() => []),
     ]).then(([m, r]) => {
       setMatched(m);
       setRecommended(r);
     }).finally(() => setLoading(false));
-  }, [needsLocation]);
+  }, [needsLocation, sortBy]);
 
   if (loading) {
     return (
@@ -39,7 +48,20 @@ export default function Dashboard() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <SyncStatus />
+        <div className="flex items-center gap-3">
+          {!needsLocation && (
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              className="bg-surface rounded-lg px-3 py-2 text-sm text-text-primary border border-surface-hover focus:border-accent focus:outline-none"
+            >
+              {SORT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          )}
+          <SyncStatus />
+        </div>
       </div>
 
       {needsLocation ? (
