@@ -1,4 +1,25 @@
+import logging
+import httpx
 from app.db import query_one, execute
+
+logger = logging.getLogger(__name__)
+
+
+def _geocode_city(city: str) -> tuple[float, float] | None:
+    """Geocode a city name to (lat, lng) using OpenStreetMap Nominatim."""
+    try:
+        resp = httpx.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": city, "format": "json", "limit": 1},
+            headers={"User-Agent": "StageScout/1.0"},
+            timeout=10,
+        )
+        results = resp.json()
+        if results:
+            return float(results[0]["lat"]), float(results[0]["lon"])
+    except Exception as e:
+        logger.warning(f"Geocoding failed for '{city}': {e}")
+    return None
 
 
 def upsert_from_spotify(spotify_id: str, email: str, display_name: str,
@@ -38,6 +59,13 @@ def update_user(user_id: int, city: str | None = None,
                 search_radius_miles: int | None = None) -> dict:
     fields = []
     params = []
+
+    # Auto-geocode city to lat/lng if coordinates aren't provided
+    if city is not None and latitude is None and longitude is None:
+        coords = _geocode_city(city)
+        if coords:
+            latitude, longitude = coords
+
     if city is not None:
         fields.append("city = %s")
         params.append(city)

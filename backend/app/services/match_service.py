@@ -70,17 +70,19 @@ def get_matched_events(user_id: int, match_type: str = None) -> list:
         params.append(match_type)
 
     # Filter by user's location radius using Haversine.
-    # Events with no venue coordinates are excluded.
+    # Events with missing venue/user coordinates are still included (pass through).
     conditions.append("""
-        v.latitude IS NOT NULL AND v.longitude IS NOT NULL
-        AND u.latitude IS NOT NULL AND u.longitude IS NOT NULL
-        AND (
-            3959 * acos(
-                LEAST(1.0, cos(radians(u.latitude)) * cos(radians(v.latitude))
-                * cos(radians(v.longitude) - radians(u.longitude))
-                + sin(radians(u.latitude)) * sin(radians(v.latitude)))
-            )
-        ) <= u.search_radius_miles
+        (
+            v.latitude IS NULL OR v.longitude IS NULL
+            OR u.latitude IS NULL OR u.longitude IS NULL
+            OR (
+                3959 * acos(
+                    LEAST(1.0, cos(radians(u.latitude)) * cos(radians(v.latitude))
+                    * cos(radians(v.longitude) - radians(u.longitude))
+                    + sin(radians(u.latitude)) * sin(radians(v.latitude)))
+                )
+            ) <= u.search_radius_miles
+        )
     """)
 
     where = " AND ".join(conditions)
