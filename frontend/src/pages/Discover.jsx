@@ -25,7 +25,7 @@ export default function Discover() {
     <div>
       <h1 className="text-2xl font-bold mb-2">Discover</h1>
       <p className="text-text-secondary mb-6">
-        Artists similar to your taste, ranked by audio similarity to your listening profile.
+        Artists similar to your taste, ranked by similarity to your listening profile.
       </p>
 
       {artists.length === 0 ? (

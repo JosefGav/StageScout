@@ -1,6 +1,6 @@
 import logging
 from app.db import query, query_one, execute
-from app.constants import AUDIO_FEATURE_KEYS, TOP_RECOMMENDED_ARTISTS
+from app.constants import TAG_VECTOR_DIM, TOP_RECOMMENDED_ARTISTS
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ def compute_taste_centroid(user_id: int):
     if not rows:
         return
 
-    dim = len(AUDIO_FEATURE_KEYS)
+    dim = TAG_VECTOR_DIM
     weighted_sum = [0.0] * dim
     total_weight = 0.0
 

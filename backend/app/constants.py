@@ -17,13 +17,8 @@ ARTIST_SORT_FIELDS = {"name", "popularity", "created_at"}
 # Matched event sort whitelists
 MATCHED_EVENT_SORT_FIELDS = {"date", "distance", "play_weight"}
 
-# Embedding config
-AUDIO_FEATURE_DIM = 11
-AUDIO_FEATURE_KEYS = [
-    "danceability", "energy", "valence", "acousticness",
-    "instrumentalness", "liveness", "speechiness",
-    "tempo", "loudness", "key", "mode"
-]
+# Tag vector config (Last.fm tags → VECTOR(50))
+TAG_VECTOR_DIM = 50
 
 # Recommendation
 TOP_RECOMMENDED_ARTISTS = 50
@@ -34,6 +29,9 @@ SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 SPOTIFY_API_BASE = "https://api.spotify.com/v1"
 SPOTIFY_SCOPES = "user-library-read playlist-read-private user-top-read user-read-email"
+
+# Last.fm
+LASTFM_BASE_URL = "https://ws.audioscrobbler.com/2.0/"
 
 # Ticketmaster
 TICKETMASTER_BASE_URL = "https://app.ticketmaster.com/discovery/v2"

@@ -1,7 +1,7 @@
 import logging
 from app.db import query, query_one, execute
-from app.constants import normalize_artist_name, AUDIO_FEATURE_KEYS
-from app.services import spotify_service
+from app.constants import normalize_artist_name
+from app.services import spotify_service, lastfm_service
 from app.services.user_service import update_sync_status, set_last_sync
 
 logger = logging.getLogger(__name__)
@@ -85,43 +85,29 @@ def get_artist_by_id(artist_id: int) -> dict | None:
     return query_one("SELECT * FROM artists WHERE id = %s", (artist_id,))
 
 
-def compute_audio_features(user_id: int, artist_ids: list[int]):
-    """Fetch audio features for artists that don't have them yet."""
+def compute_tag_vectors(artist_ids: list[int]):
+    """Fetch Last.fm tags and compute tag vectors for artists that don't have them yet."""
     if not artist_ids:
         return
 
-    token = spotify_service.get_valid_token(user_id)
-
-    artists_needing_features = query("""
-        SELECT id, spotify_id FROM artists
+    artists_needing_vectors = query("""
+        SELECT id, name FROM artists
         WHERE id = ANY(%s) AND audio_features IS NULL
     """, (artist_ids,))
 
-    for artist in artists_needing_features:
+    for artist in artists_needing_vectors:
         try:
-            tracks = spotify_service.fetch_top_tracks(token, artist["spotify_id"])
-            if not tracks:
+            vector = lastfm_service.compute_artist_tag_vector(artist["name"])
+            if not vector:
                 continue
 
-            track_ids = [t["id"] for t in tracks[:10]]
-            features = spotify_service.fetch_audio_features(token, track_ids)
-            if not features:
-                continue
-
-            # Average audio features into VECTOR(11)
-            avg_features = [0.0] * len(AUDIO_FEATURE_KEYS)
-            for f in features:
-                for i, key in enumerate(AUDIO_FEATURE_KEYS):
-                    avg_features[i] += f.get(key, 0.0)
-            avg_features = [v / len(features) for v in avg_features]
-
-            vector_str = "[" + ",".join(str(v) for v in avg_features) + "]"
+            vector_str = "[" + ",".join(str(v) for v in vector) + "]"
             execute(
                 "UPDATE artists SET audio_features = %s WHERE id = %s",
                 (vector_str, artist["id"])
             )
         except Exception as e:
-            logger.warning(f"Failed to fetch audio features for artist {artist['spotify_id']}: {e}")
+            logger.warning(f"Failed to compute tag vector for artist '{artist['name']}': {e}")
             continue
 
 
@@ -181,8 +167,8 @@ def run_full_sync(user_id: int):
         # Stage 3: Related artists + audio features + centroid
         update_sync_status(user_id, "syncing_stage3", len(unique_ids))
 
-        _fetch_related_artists_for_user(user_id, unique_ids)
-        compute_audio_features(user_id, unique_ids)
+        _fetch_related_artists_for_user(unique_ids)
+        compute_tag_vectors(unique_ids)
 
         # Compute taste centroid
         from app.services.recommendation_service import compute_taste_centroid, compute_recommendations
@@ -197,16 +183,39 @@ def run_full_sync(user_id: int):
         update_sync_status(user_id, "idle")
 
 
-def _fetch_related_artists_for_user(user_id: int, artist_ids: list[int]):
-    """Fetch related artists for each user artist, skip if already fetched."""
-    token = spotify_service.get_valid_token(user_id)
+def _upsert_artist_by_name(name: str) -> dict | None:
+    """Look up an artist by normalized name, or create a placeholder if not found."""
+    name_norm = normalize_artist_name(name)
+    existing = query_one(
+        "SELECT * FROM artists WHERE name_normalized = %s LIMIT 1",
+        (name_norm,)
+    )
+    if existing:
+        return existing
+
+    placeholder_id = f"lastfm:{name_norm}"
+    # Check if placeholder already exists
+    existing = query_one("SELECT * FROM artists WHERE spotify_id = %s", (placeholder_id,))
+    if existing:
+        return existing
+
+    execute("""
+        INSERT INTO artists (spotify_id, name, name_normalized)
+        VALUES (%s, %s, %s)
+    """, (placeholder_id, name, name_norm))
+    return query_one("SELECT * FROM artists WHERE spotify_id = %s", (placeholder_id,))
+
+
+def _fetch_related_artists_for_user(artist_ids: list[int]):
+    """Fetch similar artists from Last.fm for each user artist, skip if already fetched."""
+    new_artist_ids = []
 
     for artist_id in artist_ids:
         artist = get_artist_by_id(artist_id)
-        if not artist or not artist.get("spotify_id"):
+        if not artist:
             continue
 
-        # Check if related artists already fetched for this artist
+        # Skip if related artists already fetched for this artist
         existing = query_one(
             "SELECT 1 FROM related_artists WHERE artist_id = %s LIMIT 1",
             (artist_id,)
@@ -215,31 +224,24 @@ def _fetch_related_artists_for_user(user_id: int, artist_ids: list[int]):
             continue
 
         try:
-            related = spotify_service.fetch_related_artists(token, artist["spotify_id"])
-            new_ids = []
-            for r in related:
-                images = r.get("images", [])
-                image_url = images[0]["url"] if images else None
-                rel_artist = upsert_artist(
-                    spotify_id=r["id"],
-                    name=r["name"],
-                    image_url=image_url,
-                    popularity=r.get("popularity"),
-                    genres=r.get("genres", []),
-                )
-                new_ids.append(rel_artist["id"])
-                if rel_artist["id"] != artist_id:
-                    execute("""
-                        INSERT INTO related_artists (artist_id, related_artist_id)
-                        VALUES (%s, %s) ON CONFLICT DO NOTHING
-                    """, (artist_id, rel_artist["id"]))
-
-            # Fetch audio features for newly discovered related artists
-            compute_audio_features(user_id, new_ids)
+            similar = lastfm_service.fetch_similar_artists(artist["name"], limit=20)
+            for s in similar:
+                rel_artist = _upsert_artist_by_name(s["name"])
+                if not rel_artist or rel_artist["id"] == artist_id:
+                    continue
+                new_artist_ids.append(rel_artist["id"])
+                execute("""
+                    INSERT INTO related_artists (artist_id, related_artist_id)
+                    VALUES (%s, %s) ON CONFLICT DO NOTHING
+                """, (artist_id, rel_artist["id"]))
 
         except Exception as e:
-            logger.warning(f"Failed to fetch related artists for {artist['spotify_id']}: {e}")
+            logger.warning(f"Failed to fetch similar artists for '{artist['name']}': {e}")
             continue
+
+    # Compute tag vectors for newly discovered related artists
+    if new_artist_ids:
+        compute_tag_vectors(list(set(new_artist_ids)))
 
 
 def _backfill_artist_images(user_id: int, artist_ids: list[int]):
