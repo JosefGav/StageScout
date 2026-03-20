@@ -167,10 +167,25 @@ def run_full_sync(user_id: int):
         # Stage 3: Related artists + audio features + centroid
         update_sync_status(user_id, "syncing_stage3", len(unique_ids))
 
-        _fetch_related_artists_for_user(unique_ids)
+        # Compute tag vectors for user's own artists first (fast, ~100 artists)
         compute_tag_vectors(unique_ids)
 
-        # Compute taste centroid
+        # Fetch related artists from Last.fm (creates candidates for recommendations)
+        _fetch_related_artists_for_user(unique_ids)
+
+        # Compute tag vectors for related artists (cap at 200 to avoid timeout)
+        related_ids = [r["id"] for r in query("""
+            SELECT DISTINCT ra.related_artist_id AS id
+            FROM related_artists ra
+            WHERE ra.artist_id = ANY(%s) AND ra.related_artist_id NOT IN (
+                SELECT id FROM artists WHERE audio_features IS NOT NULL
+            )
+            LIMIT 200
+        """, (unique_ids,))]
+        if related_ids:
+            compute_tag_vectors(related_ids)
+
+        # Compute taste centroid and rank recommendations
         from app.services.recommendation_service import compute_taste_centroid, compute_recommendations
         compute_taste_centroid(user_id)
         compute_recommendations(user_id)
@@ -239,9 +254,7 @@ def _fetch_related_artists_for_user(artist_ids: list[int]):
             logger.warning(f"Failed to fetch similar artists for '{artist['name']}': {e}")
             continue
 
-    # Compute tag vectors for newly discovered related artists
-    if new_artist_ids:
-        compute_tag_vectors(list(set(new_artist_ids)))
+    # Tag vectors for related artists are computed in run_full_sync (capped at 200)
 
 
 def _backfill_artist_images(user_id: int, artist_ids: list[int]):
