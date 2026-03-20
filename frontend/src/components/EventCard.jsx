@@ -26,7 +26,7 @@ export default function EventCard({ event, matchType }) {
   return (
     <Link
       to={`/events/${id}`}
-      className="group glow-card bg-surface-card rounded-2xl overflow-hidden transition-all duration-300 block hover:scale-[1.02] hover:shadow-[0_8px_32px_rgba(124,92,252,0.15)]"
+      className="group glow-card bg-surface-card rounded-2xl overflow-hidden transition-all duration-300 block hover:scale-[1.02] hover:shadow-[0_8px_32px_rgba(255,90,54,0.15)]"
     >
       {/* Image section with overlay */}
       <div className="relative h-44 overflow-hidden">
@@ -37,7 +37,7 @@ export default function EventCard({ event, matchType }) {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-accent/20 to-grad-pink/20 flex items-center justify-center">
+          <div className="w-full h-full bg-gradient-to-br from-accent/20 to-grad-amber/20 flex items-center justify-center">
             <svg className="w-12 h-12 text-accent/40" fill="currentColor" viewBox="0 0 24 24">
               <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
             </svg>

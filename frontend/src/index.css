@@ -2,30 +2,34 @@
 @import "tailwindcss";
 
 @theme {
-  /* Deep navy/space backgrounds */
-  --color-surface: #06060F;
-  --color-surface-elevated: #0E0E1A;
-  --color-surface-hover: #161625;
-  --color-surface-card: #12121F;
+  /* Almost-black background */
+  --color-surface: #0B0B0E;
+  --color-surface-elevated: #141419;
+  --color-surface-hover: #1C1C22;
+  --color-surface-card: #141419;
 
-  /* Text */
-  --color-text-primary: #EEEEF0;
-  --color-text-secondary: #7B7B8E;
+  /* Off-white text */
+  --color-text-primary: #E8E6E1;
+  --color-text-secondary: #8A8A8A;
 
-  /* Purple/violet accent system */
-  --color-accent: #7C5CFC;
-  --color-accent-hover: #9175FF;
-  --color-accent-glow: rgba(124, 92, 252, 0.25);
+  /* Burnt orange accent */
+  --color-accent: #FF5A36;
+  --color-accent-hover: #FF7A5C;
+  --color-accent-glow: rgba(255, 90, 54, 0.25);
 
   /* Semantic */
   --color-success: #34D399;
-  --color-warning: #FBBF24;
+  --color-warning: #F59E0B;
   --color-danger: #EF4444;
 
+  /* Amber secondary */
+  --color-secondary: #F59E0B;
+  --color-secondary-hover: #FBBF24;
+
   /* Gradients reference colors */
-  --color-grad-purple: #7C5CFC;
-  --color-grad-pink: #E84393;
-  --color-grad-blue: #4A6CF7;
+  --color-grad-orange: #FF5A36;
+  --color-grad-amber: #F59E0B;
+  --color-grad-red: #E63E1C;
 }
 
 * {
@@ -53,16 +57,16 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a3e;
+  background: #2A2A2F;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a52;
+  background: #3A3A40;
 }
 
 /* Gradient text utility */
 .text-gradient {
-  background: linear-gradient(135deg, #7C5CFC, #E84393);
+  background: linear-gradient(135deg, #FF5A36, #F59E0B);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -79,7 +83,7 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.2), rgba(232, 67, 147, 0.1), transparent);
+  background: linear-gradient(135deg, rgba(255, 90, 54, 0.2), rgba(245, 158, 11, 0.1), transparent);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -89,30 +93,30 @@ body {
 
 /* Gradient button */
 .btn-gradient {
-  background: linear-gradient(135deg, #7C5CFC, #E84393);
+  background: linear-gradient(135deg, #FF5A36, #F59E0B);
   transition: all 0.3s ease;
 }
 .btn-gradient:hover {
-  background: linear-gradient(135deg, #9175FF, #F06AAC);
-  box-shadow: 0 4px 20px rgba(124, 92, 252, 0.4);
+  background: linear-gradient(135deg, #FF7A5C, #FBBF24);
+  box-shadow: 0 4px 20px rgba(255, 90, 54, 0.4);
 }
 
 /* Leaflet dark theme overrides */
 .leaflet-container {
-  background: #06060F;
+  background: #0B0B0E;
 }
 .leaflet-control-zoom a {
-  background-color: #0E0E1A !important;
-  color: #EEEEF0 !important;
-  border-color: #161625 !important;
+  background-color: #141419 !important;
+  color: #E8E6E1 !important;
+  border-color: #1C1C22 !important;
 }
 .leaflet-control-zoom a:hover {
-  background-color: #161625 !important;
+  background-color: #1C1C22 !important;
 }
 .leaflet-control-attribution {
-  background-color: rgba(6, 6, 15, 0.7) !important;
-  color: #7B7B8E !important;
+  background-color: rgba(11, 11, 14, 0.7) !important;
+  color: #8A8A8A !important;
 }
 .leaflet-control-attribution a {
-  color: #7C5CFC !important;
+  color: #FF5A36 !important;
 }

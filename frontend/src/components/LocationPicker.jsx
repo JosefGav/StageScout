@@ -212,8 +212,8 @@ export default function LocationPicker({ city, setCity, latitude, longitude, set
               center={[latitude, longitude]}
               radius={radius * 1609.34}
               pathOptions={{
-                color: '#7C5CFC',
-                fillColor: '#7C5CFC',
+                color: '#FF5A36',
+                fillColor: '#FF5A36',
                 fillOpacity: 0.1,
                 weight: 2,
               }}

@@ -135,7 +135,7 @@ export default function EventDetail() {
           {event.artists && event.artists.length > 0 && (
             <div className="mb-8">
               <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-grad-pink" />
+                <span className="w-1.5 h-1.5 rounded-full bg-grad-amber" />
                 All Artists
               </h2>
               <div className="flex flex-wrap gap-2">

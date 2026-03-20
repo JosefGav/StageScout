@@ -67,9 +67,20 @@ function Sidebar() {
       {/* Logo */}
       <div className="p-5 pb-4">
         <Link to="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-grad-pink flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-grad-amber flex items-center justify-center">
+            <svg className="w-[18px] h-[18px] text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Light beams */}
+              <polygon points="5,2 2,14 8,14" fill="currentColor" opacity="0.35" />
+              <polygon points="12,1 9,14 15,14" fill="currentColor" opacity="0.55" />
+              <polygon points="19,2 16,14 22,14" fill="currentColor" opacity="0.35" />
+              {/* Stage platform */}
+              <rect x="1" y="17" width="22" height="3" rx="1" fill="currentColor" />
+              {/* Stage edge highlight */}
+              <line x1="3" y1="17" x2="21" y2="17" stroke="currentColor" strokeWidth="1.2" opacity="0.6" />
+              {/* Spotlight heads */}
+              <circle cx="5" cy="2" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="1" r="1.8" fill="currentColor" />
+              <circle cx="19" cy="2" r="1.5" fill="currentColor" />
             </svg>
           </div>
           <span className="text-lg font-bold text-gradient">StageScout</span>
@@ -86,7 +97,7 @@ function Sidebar() {
               to={link.to}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                 active
-                  ? 'bg-accent/15 text-accent shadow-[inset_0_0_0_1px_rgba(124,92,252,0.15)]'
+                  ? 'bg-accent/15 text-accent shadow-[inset_0_0_0_1px_rgba(255,90,54,0.15)]'
                   : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
               }`}
             >
@@ -104,7 +115,7 @@ function Sidebar() {
             {user.avatar_url ? (
               <img src={user.avatar_url} className="w-9 h-9 rounded-full ring-2 ring-accent/30" alt="" />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-grad-pink flex items-center justify-center text-sm font-semibold text-white">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent to-grad-amber flex items-center justify-center text-sm font-semibold text-white">
                 {user.display_name?.[0] || '?'}
               </div>
             )}

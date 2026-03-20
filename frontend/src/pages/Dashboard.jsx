@@ -122,7 +122,7 @@ export default function Dashboard() {
             <div className="flex items-center gap-3 mb-5">
               <h2 className="text-xl font-bold">You Might Also Like</h2>
               {recommended.length > 0 && (
-                <span className="bg-grad-pink/15 text-grad-pink text-xs font-semibold px-2.5 py-1 rounded-full">
+                <span className="bg-grad-amber/15 text-grad-amber text-xs font-semibold px-2.5 py-1 rounded-full">
                   {recommended.length}
                 </span>
               )}
