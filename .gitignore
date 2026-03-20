@@ -6,3 +6,5 @@ dist/
 .vite/
 *.log
 .DS_Store
+CLAUDE.md
+implementation-plan.md
