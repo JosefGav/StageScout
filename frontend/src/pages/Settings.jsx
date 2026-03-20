@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import LocationPicker from '../components/LocationPicker';
 
 export default function Settings() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [message, setMessage] = useState('');
@@ -160,6 +162,14 @@ export default function Settings() {
           {syncing ? 'Starting...' : 'Re-sync Now'}
         </button>
       </section>
+
+      {/* Logout — visible on mobile where sidebar is hidden */}
+      <button
+        onClick={() => { logout(); navigate('/'); }}
+        className="md:hidden w-full mt-5 py-3 rounded-xl border border-white/10 text-sm text-text-secondary hover:text-danger hover:border-danger/30 transition"
+      >
+        Log out
+      </button>
     </div>
   );
 }
