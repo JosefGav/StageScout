@@ -144,15 +144,15 @@ export default function LocationPicker({ city, setCity, latitude, longitude, set
           value={query}
           onChange={e => { setQuery(e.target.value); setShowDropdown(true); }}
           placeholder="e.g. New York, Toronto, London"
-          className="w-full bg-surface rounded-lg px-3 py-2 text-text-primary border border-surface-hover focus:border-accent focus:outline-none"
+          className="w-full bg-surface border border-white/10 rounded-xl px-4 py-2.5 text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
         />
         {showDropdown && results.length > 0 && (
-          <ul className="absolute z-[1000] w-full mt-1 bg-surface-elevated rounded-lg border border-surface-hover shadow-lg max-h-60 overflow-y-auto">
+          <ul className="absolute z-[1000] w-full mt-1 bg-surface-elevated rounded-xl border border-white/10 shadow-lg max-h-60 overflow-y-auto">
             {results.map((r, i) => (
               <li
                 key={i}
                 onClick={() => selectResult(r)}
-                className="px-3 py-2 text-sm text-text-primary hover:bg-surface-hover cursor-pointer first:rounded-t-lg last:rounded-b-lg"
+                className="px-4 py-2.5 text-sm text-text-primary hover:bg-white/5 cursor-pointer first:rounded-t-xl last:rounded-b-xl"
               >
                 {r.display_name}
               </li>
@@ -187,7 +187,7 @@ export default function LocationPicker({ city, setCity, latitude, longitude, set
           onChange={e => setRadius(Number(e.target.value))}
           min={10}
           max={500}
-          className="w-full bg-surface rounded-lg px-3 py-2 text-text-primary border border-surface-hover focus:border-accent focus:outline-none"
+          className="w-full bg-surface border border-white/10 rounded-xl px-4 py-2.5 text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
         />
       </div>
 
@@ -195,7 +195,7 @@ export default function LocationPicker({ city, setCity, latitude, longitude, set
       <MapContainer
         center={hasPosition ? [latitude, longitude] : DEFAULT_CENTER}
         zoom={hasPosition ? 10 : DEFAULT_ZOOM}
-        className="h-64 rounded-lg border border-surface-hover"
+        className="h-64 rounded-xl border border-white/10"
         style={{ zIndex: 0 }}
       >
         <TileLayer url={TILE_URL} attribution={TILE_ATTR} />
@@ -212,8 +212,8 @@ export default function LocationPicker({ city, setCity, latitude, longitude, set
               center={[latitude, longitude]}
               radius={radius * 1609.34}
               pathOptions={{
-                color: '#4A90D9',
-                fillColor: '#4A90D9',
+                color: '#7C5CFC',
+                fillColor: '#7C5CFC',
                 fillOpacity: 0.1,
                 weight: 2,
               }}

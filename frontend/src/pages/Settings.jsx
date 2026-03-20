@@ -63,18 +63,24 @@ export default function Settings() {
   };
 
   return (
-    <div className="max-w-lg">
-      <h1 className="text-2xl font-bold mb-6">Settings</h1>
+    <div className="max-w-xl">
+      <h1 className="text-3xl font-extrabold mb-8">Settings</h1>
 
       {message && (
-        <div className="bg-surface-elevated rounded-lg px-4 py-3 mb-4 text-sm text-accent">
+        <div className="bg-accent/10 border border-accent/20 rounded-xl px-5 py-3 mb-6 text-sm text-accent font-medium">
           {message}
         </div>
       )}
 
       {/* Location */}
-      <section className="bg-surface-elevated rounded-lg p-6 mb-4">
-        <h2 className="text-lg font-semibold mb-4">Location</h2>
+      <section className="glow-card bg-surface-card rounded-2xl p-6 md:p-8 mb-5">
+        <h2 className="text-lg font-bold mb-5 flex items-center gap-2">
+          <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Location
+        </h2>
         <LocationPicker
           city={city}
           setCity={setCity}
@@ -87,30 +93,39 @@ export default function Settings() {
         <button
           onClick={saveLocation}
           disabled={saving}
-          className="mt-4 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg transition disabled:opacity-50"
+          className="mt-5 btn-gradient text-white px-6 py-2.5 rounded-xl font-semibold transition disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Location'}
         </button>
       </section>
 
       {/* Notifications */}
-      <section className="bg-surface-elevated rounded-lg p-6 mb-4">
-        <h2 className="text-lg font-semibold mb-4">Notifications</h2>
-        <label className="flex items-center gap-3 cursor-pointer mb-4">
-          <input
-            type="checkbox"
-            checked={digestEnabled}
-            onChange={e => setDigestEnabled(e.target.checked)}
-            className="w-4 h-4 accent-accent"
-          />
+      <section className="glow-card bg-surface-card rounded-2xl p-6 md:p-8 mb-5">
+        <h2 className="text-lg font-bold mb-5 flex items-center gap-2">
+          <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          Notifications
+        </h2>
+        <label className="flex items-center gap-3 cursor-pointer mb-5 group">
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={digestEnabled}
+              onChange={e => setDigestEnabled(e.target.checked)}
+              className="sr-only peer"
+            />
+            <div className="w-10 h-6 bg-white/10 rounded-full peer-checked:bg-accent transition-colors" />
+            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-4 shadow" />
+          </div>
           <span className="text-sm">Email digest enabled</span>
         </label>
         <div>
-          <label className="text-sm text-text-secondary block mb-1">Frequency</label>
+          <label className="text-sm text-text-secondary block mb-2">Frequency</label>
           <select
             value={digestFrequency}
             onChange={e => setDigestFrequency(e.target.value)}
-            className="w-full bg-surface rounded-lg px-3 py-2 text-text-primary border border-surface-hover focus:border-accent focus:outline-none"
+            className="w-full bg-surface border border-white/10 rounded-xl px-4 py-2.5 text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30 appearance-none cursor-pointer"
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -120,22 +135,27 @@ export default function Settings() {
         <button
           onClick={saveNotifications}
           disabled={saving}
-          className="mt-4 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg transition disabled:opacity-50"
+          className="mt-5 btn-gradient text-white px-6 py-2.5 rounded-xl font-semibold transition disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save Preferences'}
         </button>
       </section>
 
       {/* Sync */}
-      <section className="bg-surface-elevated rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Spotify Sync</h2>
-        <p className="text-sm text-text-secondary mb-4">
+      <section className="glow-card bg-surface-card rounded-2xl p-6 md:p-8">
+        <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
+          <svg className="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Spotify Sync
+        </h2>
+        <p className="text-sm text-text-secondary mb-5">
           Re-sync your Spotify library to discover new artists and update recommendations.
         </p>
         <button
           onClick={triggerSync}
           disabled={syncing}
-          className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg transition disabled:opacity-50"
+          className="btn-gradient text-white px-6 py-2.5 rounded-xl font-semibold transition disabled:opacity-50"
         >
           {syncing ? 'Starting...' : 'Re-sync Now'}
         </button>

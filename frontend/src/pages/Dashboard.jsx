@@ -39,21 +39,29 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" />
+        <div className="w-10 h-10 rounded-full border-2 border-accent border-t-transparent animate-spin" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="max-w-6xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-extrabold">Dashboard</h1>
+          {user?.city && (
+            <p className="text-text-secondary text-sm mt-1">
+              Concerts near {user.city}
+            </p>
+          )}
+        </div>
         <div className="flex items-center gap-3">
           {!needsLocation && (
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="bg-surface rounded-lg px-3 py-2 text-sm text-text-primary border border-surface-hover focus:border-accent focus:outline-none"
+              className="bg-surface-card border border-white/10 rounded-xl px-4 py-2.5 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30 appearance-none cursor-pointer"
             >
               {SORT_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -65,34 +73,43 @@ export default function Dashboard() {
       </div>
 
       {needsLocation ? (
-        <div className="bg-surface-elevated rounded-lg p-8 text-center">
-          <p className="text-text-secondary text-lg mb-4">
+        <div className="glow-card bg-surface-card rounded-2xl p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto mb-5">
+            <svg className="w-8 h-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <p className="text-text-secondary text-lg mb-6">
             Set your city to find concerts near you
           </p>
           <Link
             to="/settings"
-            className="inline-block bg-accent hover:bg-accent-hover text-white px-6 py-2 rounded-lg transition"
+            className="btn-gradient inline-block text-white px-8 py-3 rounded-xl font-semibold"
           >
             Set your location
           </Link>
         </div>
       ) : (
         <>
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">
-              Your Matches
+          {/* Matched Events */}
+          <section className="mb-10">
+            <div className="flex items-center gap-3 mb-5">
+              <h2 className="text-xl font-bold">Your Matches</h2>
               {matched.length > 0 && (
-                <span className="ml-2 text-sm font-normal text-text-secondary">
-                  ({matched.length})
+                <span className="bg-accent/15 text-accent text-xs font-semibold px-2.5 py-1 rounded-full">
+                  {matched.length}
                 </span>
               )}
-            </h2>
+            </div>
             {matched.length === 0 ? (
-              <p className="text-text-secondary">
-                No exact matches yet. We'll check again soon!
-              </p>
+              <div className="bg-surface-card rounded-2xl p-8 text-center border border-white/5">
+                <p className="text-text-secondary">
+                  No exact matches yet. We'll check again soon!
+                </p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {matched.map(m => (
                   <EventCard key={m.event_id} event={m} matchType="exact" />
                 ))}
@@ -100,21 +117,24 @@ export default function Dashboard() {
             )}
           </section>
 
+          {/* Recommended Events */}
           <section>
-            <h2 className="text-xl font-semibold mb-4">
-              You Might Also Like
+            <div className="flex items-center gap-3 mb-5">
+              <h2 className="text-xl font-bold">You Might Also Like</h2>
               {recommended.length > 0 && (
-                <span className="ml-2 text-sm font-normal text-text-secondary">
-                  ({recommended.length})
+                <span className="bg-grad-pink/15 text-grad-pink text-xs font-semibold px-2.5 py-1 rounded-full">
+                  {recommended.length}
                 </span>
               )}
-            </h2>
+            </div>
             {recommended.length === 0 ? (
-              <p className="text-text-secondary">
-                Like more artists on Spotify to get recommendations!
-              </p>
+              <div className="bg-surface-card rounded-2xl p-8 text-center border border-white/5">
+                <p className="text-text-secondary">
+                  Like more artists on Spotify to get recommendations!
+                </p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {recommended.map(m => (
                   <EventCard key={m.event_id} event={m} matchType="similar" />
                 ))}

@@ -2,18 +2,31 @@ import SpotifyLoginButton from '../components/SpotifyLoginButton';
 
 export default function Landing() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-lg text-center">
-        <div className="text-6xl mb-6">🎵</div>
-        <h1 className="text-4xl font-bold text-text-primary mb-4">
-          Concert Discovery
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background gradient orbs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-accent/20 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-grad-pink/15 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[30%] right-[20%] w-[300px] h-[300px] rounded-full bg-grad-blue/10 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-xl text-center relative z-10">
+        {/* Logo */}
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-grad-pink mb-8 shadow-[0_0_40px_rgba(124,92,252,0.4)]">
+          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+          </svg>
+        </div>
+
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-4 leading-tight">
+          <span className="text-gradient">StageScout</span>
         </h1>
-        <p className="text-text-secondary text-lg mb-8">
+        <p className="text-text-secondary text-lg md:text-xl mb-10 leading-relaxed max-w-md mx-auto">
           Connect your Spotify account to discover upcoming concerts from
           artists you love — and find new ones you'll like.
         </p>
+
         <SpotifyLoginButton />
-        <p className="text-text-secondary text-sm mt-6">
+
+        <p className="text-text-secondary/60 text-sm mt-8">
           We'll analyze your listening history to find concerts near you.
         </p>
       </div>

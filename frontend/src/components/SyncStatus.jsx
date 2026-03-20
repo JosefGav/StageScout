@@ -25,13 +25,13 @@ export default function SyncStatus() {
   };
 
   return (
-    <div className="flex items-center gap-2 bg-surface-elevated rounded-full px-4 py-2 text-sm">
+    <div className="flex items-center gap-2.5 bg-accent/10 border border-accent/20 rounded-xl px-4 py-2.5 text-sm backdrop-blur-sm">
       <div className="animate-spin w-4 h-4 border-2 border-accent border-t-transparent rounded-full" />
       <span className="text-text-secondary">
         {stageLabels[status.stage] || 'Syncing...'}
       </span>
       {status.artists_found > 0 && (
-        <span className="text-accent">{status.artists_found} artists</span>
+        <span className="text-accent font-semibold">{status.artists_found} artists</span>
       )}
     </div>
   );

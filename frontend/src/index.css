@@ -2,16 +2,30 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #0F1115;
-  --color-surface-elevated: #1A1D23;
-  --color-surface-hover: #22252B;
-  --color-text-primary: #E8E8E8;
-  --color-text-secondary: #8A8A92;
-  --color-accent: #4A90D9;
-  --color-accent-hover: #5DA0E9;
+  /* Deep navy/space backgrounds */
+  --color-surface: #06060F;
+  --color-surface-elevated: #0E0E1A;
+  --color-surface-hover: #161625;
+  --color-surface-card: #12121F;
+
+  /* Text */
+  --color-text-primary: #EEEEF0;
+  --color-text-secondary: #7B7B8E;
+
+  /* Purple/violet accent system */
+  --color-accent: #7C5CFC;
+  --color-accent-hover: #9175FF;
+  --color-accent-glow: rgba(124, 92, 252, 0.25);
+
+  /* Semantic */
   --color-success: #34D399;
   --color-warning: #FBBF24;
   --color-danger: #EF4444;
+
+  /* Gradients reference colors */
+  --color-grad-purple: #7C5CFC;
+  --color-grad-pink: #E84393;
+  --color-grad-blue: #4A6CF7;
 }
 
 * {
@@ -20,7 +34,7 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
@@ -31,22 +45,74 @@ body {
   min-height: 100vh;
 }
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a3e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a52;
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, #7C5CFC, #E84393);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow card effect */
+.glow-card {
+  position: relative;
+  overflow: hidden;
+}
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124, 92, 252, 0.2), rgba(232, 67, 147, 0.1), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Gradient button */
+.btn-gradient {
+  background: linear-gradient(135deg, #7C5CFC, #E84393);
+  transition: all 0.3s ease;
+}
+.btn-gradient:hover {
+  background: linear-gradient(135deg, #9175FF, #F06AAC);
+  box-shadow: 0 4px 20px rgba(124, 92, 252, 0.4);
+}
+
 /* Leaflet dark theme overrides */
 .leaflet-container {
-  background: #0F1115;
+  background: #06060F;
 }
 .leaflet-control-zoom a {
-  background-color: #1A1D23 !important;
-  color: #E8E8E8 !important;
-  border-color: #22252B !important;
+  background-color: #0E0E1A !important;
+  color: #EEEEF0 !important;
+  border-color: #161625 !important;
 }
 .leaflet-control-zoom a:hover {
-  background-color: #22252B !important;
+  background-color: #161625 !important;
 }
 .leaflet-control-attribution {
-  background-color: rgba(15, 17, 21, 0.7) !important;
-  color: #8A8A92 !important;
+  background-color: rgba(6, 6, 15, 0.7) !important;
+  color: #7B7B8E !important;
 }
 .leaflet-control-attribution a {
-  color: #4A90D9 !important;
+  color: #7C5CFC !important;
 }
