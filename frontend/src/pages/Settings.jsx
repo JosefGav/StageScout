@@ -64,7 +64,7 @@ export default function Settings() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="text-3xl font-extrabold mb-8">Settings</h1>
+      <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 sm:mb-8">Settings</h1>
 
       {message && (
         <div className="bg-accent/10 border border-accent/20 rounded-xl px-5 py-3 mb-6 text-sm text-accent font-medium">

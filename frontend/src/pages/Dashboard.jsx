@@ -49,7 +49,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold">Dashboard</h1>
           {user?.city && (
             <p className="text-text-secondary text-sm mt-1">
               Concerts near {user.city}
@@ -73,7 +73,7 @@ export default function Dashboard() {
       </div>
 
       {needsLocation ? (
-        <div className="glow-card bg-surface-card rounded-2xl p-12 text-center">
+        <div className="glow-card bg-surface-card rounded-2xl p-8 sm:p-12 text-center">
           <div className="w-16 h-16 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto mb-5">
             <svg className="w-8 h-8 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -109,7 +109,7 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {matched.map(m => (
                   <EventCard key={m.event_id} event={m} matchType="exact" />
                 ))}
@@ -134,7 +134,7 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 {recommended.map(m => (
                   <EventCard key={m.event_id} event={m} matchType="similar" />
                 ))}

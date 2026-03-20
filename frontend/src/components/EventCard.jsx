@@ -29,7 +29,7 @@ export default function EventCard({ event, matchType }) {
       className="group glow-card bg-surface-card rounded-2xl overflow-hidden transition-all duration-300 block hover:scale-[1.02] hover:shadow-[0_8px_32px_rgba(255,90,54,0.15)]"
     >
       {/* Image section with overlay */}
-      <div className="relative h-44 overflow-hidden">
+      <div className="relative h-36 sm:h-44 overflow-hidden">
         {image ? (
           <img
             src={image}

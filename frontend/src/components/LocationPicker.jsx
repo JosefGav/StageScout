@@ -195,7 +195,7 @@ export default function LocationPicker({ city, setCity, latitude, longitude, set
       <MapContainer
         center={hasPosition ? [latitude, longitude] : DEFAULT_CENTER}
         zoom={hasPosition ? 10 : DEFAULT_ZOOM}
-        className="h-64 rounded-xl border border-white/10"
+        className="h-48 sm:h-64 rounded-xl border border-white/10"
         style={{ zIndex: 0 }}
       >
         <TileLayer url={TILE_URL} attribution={TILE_ATTR} />

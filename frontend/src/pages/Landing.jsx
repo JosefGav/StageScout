@@ -8,10 +8,10 @@ export default function Landing() {
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-grad-amber/15 blur-[120px] pointer-events-none" />
       <div className="absolute top-[30%] right-[20%] w-[300px] h-[300px] rounded-full bg-grad-red/10 blur-[100px] pointer-events-none" />
 
-      <div className="max-w-xl text-center relative z-10">
+      <div className="max-w-xl text-center relative z-10 px-2">
         {/* Logo */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-grad-amber mb-8 shadow-[0_0_40px_rgba(255,90,54,0.4)]">
-          <svg className="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-accent to-grad-amber mb-6 sm:mb-8 shadow-[0_0_40px_rgba(255,90,54,0.4)]">
+          <svg className="w-7 h-7 sm:w-9 sm:h-9 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Light beams */}
             <polygon points="5,2 2,14 8,14" fill="currentColor" opacity="0.35" />
             <polygon points="12,1 9,14 15,14" fill="currentColor" opacity="0.55" />
@@ -27,10 +27,10 @@ export default function Landing() {
           </svg>
         </div>
 
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-4 leading-tight">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 leading-tight">
           <span className="text-gradient">StageScout</span>
         </h1>
-        <p className="text-text-secondary text-lg md:text-xl mb-10 leading-relaxed max-w-md mx-auto">
+        <p className="text-text-secondary text-base sm:text-lg md:text-xl mb-8 sm:mb-10 leading-relaxed max-w-md mx-auto">
           Connect your Spotify account to discover upcoming concerts from
           artists you love — and find new ones you'll like.
         </p>

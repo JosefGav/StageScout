@@ -61,34 +61,34 @@ export default function EventDetail() {
       <div className="glow-card bg-surface-card rounded-2xl overflow-hidden">
         {/* Hero image */}
         {event.image_url && (
-          <div className="relative h-72 md:h-80">
+          <div className="relative h-48 sm:h-64 md:h-80">
             <img
               src={event.image_url}
               alt={event.name}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-surface-card via-surface-card/50 to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6">
-              <h1 className="text-3xl md:text-4xl font-extrabold drop-shadow-lg">{event.name}</h1>
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold drop-shadow-lg">{event.name}</h1>
             </div>
           </div>
         )}
 
-        <div className="p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           {!event.image_url && (
-            <h1 className="text-3xl font-extrabold mb-4">{event.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold mb-4">{event.name}</h1>
           )}
 
           {/* Info pills */}
-          <div className="flex flex-wrap gap-3 mb-8">
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm">
+          <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
+            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm">
               <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               <span>{date}{time && `, ${time}`}</span>
             </div>
             {event.venue_name && (
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm">
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm">
                 <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -97,7 +97,7 @@ export default function EventDetail() {
               </div>
             )}
             {(event.price_min || event.price_max) && (
-              <div className="flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-xl px-4 py-2.5 text-sm font-semibold text-accent">
+              <div className="flex items-center gap-2 bg-accent/10 border border-accent/20 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-semibold text-accent">
                 <span>${event.price_min ?? '?'} – ${event.price_max ?? '?'}</span>
               </div>
             )}
@@ -152,7 +152,7 @@ export default function EventDetail() {
               href={event.ticket_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-gradient inline-flex items-center gap-2 text-white px-8 py-3.5 rounded-xl font-semibold text-base"
+              className="btn-gradient inline-flex items-center justify-center gap-2 text-white w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold text-base"
             >
               Get Tickets
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

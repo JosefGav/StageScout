@@ -140,14 +140,14 @@ function MobileNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-surface-elevated/80 backdrop-blur-xl border-t border-white/5 px-2 py-1 flex justify-around md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-surface-elevated/80 backdrop-blur-xl border-t border-white/5 px-2 flex justify-around md:hidden" style={{ paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))' }}>
       {NAV_LINKS.map(link => {
         const active = location.pathname === link.to;
         return (
           <Link
             key={link.to}
             to={link.to}
-            className={`flex flex-col items-center gap-0.5 py-2 px-3 rounded-lg text-xs transition ${
+            className={`flex flex-col items-center gap-0.5 py-2 px-3 rounded-lg text-[11px] sm:text-xs transition ${
               active ? 'text-accent' : 'text-text-secondary'
             }`}
           >
@@ -183,7 +183,7 @@ export default function App() {
               <div className="hidden md:block">
                 <Sidebar />
               </div>
-              <main className="flex-1 p-4 md:p-8 overflow-auto pb-20 md:pb-8">
+              <main className="flex-1 px-4 py-5 sm:p-6 md:p-8 overflow-auto pb-24 md:pb-8">
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/events/:id" element={<EventDetail />} />
