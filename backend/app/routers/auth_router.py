@@ -1,10 +1,14 @@
 import os
+import logging
 import secrets
 from urllib.parse import urlencode
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from app.schemas import SpotifyCallbackRequest, AuthResponse
 from app.auth import create_jwt
+from app.rate_limit import limiter
+
+logger = logging.getLogger(__name__)
 from app.services.user_service import upsert_from_spotify
 from app.services.spotify_service import exchange_code, fetch_profile
 from app.constants import SPOTIFY_AUTH_URL, SPOTIFY_SCOPES
@@ -24,7 +28,8 @@ def _cleanup_states():
 
 
 @router.get("/spotify/login")
-def spotify_login():
+@limiter.limit("10/minute")
+def spotify_login(request: Request):
     _cleanup_states()
     state = secrets.token_urlsafe(32)
     _oauth_states[state] = datetime.now(timezone.utc).timestamp()
@@ -44,7 +49,8 @@ def spotify_login():
 
 
 @router.post("/spotify/callback")
-def spotify_callback(body: SpotifyCallbackRequest):
+@limiter.limit("10/minute")
+def spotify_callback(request: Request, body: SpotifyCallbackRequest):
     # Verify state
     if body.state not in _oauth_states:
         raise HTTPException(status_code=400, detail="Invalid or expired state")
@@ -54,7 +60,8 @@ def spotify_callback(body: SpotifyCallbackRequest):
     try:
         token_data = exchange_code(body.code)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Token exchange failed: {e}")
+        logger.error(f"Token exchange failed: {e}")
+        raise HTTPException(status_code=400, detail="Authentication failed")
 
     access_token = token_data["access_token"]
     refresh_token = token_data.get("refresh_token", "")
@@ -65,7 +72,8 @@ def spotify_callback(body: SpotifyCallbackRequest):
     try:
         profile = fetch_profile(access_token)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch profile: {e}")
+        logger.error(f"Failed to fetch Spotify profile: {e}")
+        raise HTTPException(status_code=400, detail="Authentication failed")
 
     spotify_id = profile["id"]
     email = profile.get("email", "")

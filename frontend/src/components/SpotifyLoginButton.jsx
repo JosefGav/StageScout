@@ -1,9 +1,22 @@
 import { api } from '../api/client';
 
+function isValidSpotifyUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && parsed.hostname === 'accounts.spotify.com';
+  } catch {
+    return false;
+  }
+}
+
 export default function SpotifyLoginButton() {
   const handleLogin = async () => {
     try {
       const data = await api.get('/auth/spotify/login');
+      if (!isValidSpotifyUrl(data.url)) {
+        console.error('Invalid Spotify login URL');
+        return;
+      }
       window.location.href = data.url;
     } catch (err) {
       console.error('Failed to get Spotify login URL:', err);

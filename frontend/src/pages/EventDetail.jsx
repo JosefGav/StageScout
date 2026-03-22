@@ -3,6 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../api/client';
 import ArtistChip from '../components/ArtistChip';
 
+function isSafeUrl(url) {
+  try { return ['http:', 'https:'].includes(new URL(url).protocol); }
+  catch { return false; }
+}
+
 export default function EventDetail() {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
@@ -147,7 +152,7 @@ export default function EventDetail() {
           )}
 
           {/* CTA */}
-          {event.ticket_url && (
+          {event.ticket_url && isSafeUrl(event.ticket_url) && (
             <a
               href={event.ticket_url}
               target="_blank"

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 from decimal import Decimal
 
@@ -8,8 +8,8 @@ from decimal import Decimal
 # Auth
 # ============================================================
 class SpotifyCallbackRequest(BaseModel):
-    code: str
-    state: str
+    code: str = Field(..., max_length=512)
+    state: str = Field(..., max_length=128)
 
 
 class AuthResponse(BaseModel):
@@ -39,15 +39,15 @@ class UserOut(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    city: Optional[str] = None
+    city: Optional[str] = Field(None, max_length=200)
     latitude: Optional[Decimal] = None
     longitude: Optional[Decimal] = None
-    search_radius_miles: Optional[int] = None
+    search_radius_miles: Optional[int] = Field(None, ge=1, le=500)
 
 
 class NotificationPrefsUpdate(BaseModel):
     digest_enabled: Optional[bool] = None
-    digest_frequency: Optional[str] = None
+    digest_frequency: Optional[Literal["daily", "weekly", "monthly"]] = None
 
 
 class SyncStatusOut(BaseModel):

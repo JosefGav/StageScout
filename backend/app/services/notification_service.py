@@ -1,5 +1,7 @@
 import os
 import logging
+from html import escape as html_escape
+from urllib.parse import urlparse
 import resend
 from app.db import query, execute
 
@@ -65,28 +67,49 @@ def send_digest(user_id: int, email_type: str = "weekly_digest") -> dict | None:
 
     except Exception as e:
         logger.error(f"Failed to send digest to user {user_id}: {e}")
-        return {"sent": False, "error": str(e)}
+        return {"sent": False, "error": "Failed to send digest email"}
+
+
+def _safe_ticket_url(url: str) -> str:
+    """Only allow http/https ticket URLs."""
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme in ("http", "https"):
+            return url
+    except Exception:
+        pass
+    return ""
 
 
 def _build_digest_html(display_name: str, matches: list) -> str:
     rows = ""
     for m in matches:
         date_str = m["event_date"].strftime("%b %d, %Y") if m.get("event_date") else "TBD"
-        venue = f"{m.get('venue_name', '')} — {m.get('venue_city', '')}" if m.get("venue_name") else ""
-        ticket = f'<a href="{m["ticket_url"]}">Get Tickets</a>' if m.get("ticket_url") else ""
+        venue_name = html_escape(m.get("venue_name", ""))
+        venue_city = html_escape(m.get("venue_city", ""))
+        venue = f"{venue_name} — {venue_city}" if venue_name else ""
+        artist_name = html_escape(m.get("artist_name", ""))
+        event_name = html_escape(m.get("event_name", ""))
+
+        ticket = ""
+        if m.get("ticket_url"):
+            safe_url = _safe_ticket_url(m["ticket_url"])
+            if safe_url:
+                ticket = f'<a href="{html_escape(safe_url)}">Get Tickets</a>'
+
         rows += f"""
         <tr>
             <td style="padding:12px;border-bottom:1px solid #2a2d35;">
-                <strong>{m.get('artist_name', '')}</strong><br>
-                <span style="color:#8a8a92;">{m.get('event_name', '')}</span><br>
-                <span style="color:#8a8a92;">{date_str} · {venue}</span><br>
+                <strong>{artist_name}</strong><br>
+                <span style="color:#8a8a92;">{event_name}</span><br>
+                <span style="color:#8a8a92;">{html_escape(date_str)} · {venue}</span><br>
                 {ticket}
             </td>
         </tr>"""
 
     return f"""
     <div style="background:#0f1115;color:#e8e8e8;padding:32px;font-family:Inter,sans-serif;">
-        <h1 style="color:#4a90d9;">Hey {display_name}!</h1>
+        <h1 style="color:#4a90d9;">Hey {html_escape(display_name)}!</h1>
         <p>We found {len(matches)} upcoming concerts from artists you listen to:</p>
         <table style="width:100%;border-collapse:collapse;">
             {rows}

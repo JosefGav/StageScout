@@ -4,7 +4,9 @@ from datetime import datetime, timezone, timedelta
 from fastapi import Depends, HTTPException, Request
 from app.db import query_one
 
-JWT_SECRET = os.environ.get("JWT_SECRET_KEY", "dev-secret")
+JWT_SECRET = os.environ.get("JWT_SECRET_KEY")
+if not JWT_SECRET:
+    raise RuntimeError("JWT_SECRET_KEY environment variable is required")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_DAYS = 7
 
