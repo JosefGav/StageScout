@@ -13,3 +13,6 @@ Settings features:
 - Location selector (text input + map + search radius)
 - Notifications preferences
 - Resync spotify preferences to discover new artists and update recommendations. 
+<img width="1888" height="929" alt="image" src="https://github.com/user-attachments/assets/2ce7b61c-f540-47b8-81a1-b36bbcbe2c76" />
+<img width="1847" height="894" alt="image" src="https://github.com/user-attachments/assets/20aa30de-a6cc-48dc-9563-c7606eeee648" />
+
